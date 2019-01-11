@@ -2214,6 +2214,7 @@ int main(int argc, char *argv[])
 //    char *osc_port = "6666";
     char *osc_port = NULL;
     const char *gui_url = NULL;
+    const char *load_session = NULL;
 
     static struct option long_options[] = 
     {
@@ -2222,6 +2223,7 @@ int main(int argc, char *argv[])
         { "osc-port", required_argument, 0, 'p' },
         { "gui-url", required_argument, 0, 'g' },
         { "help", no_argument, 0, 'h' },
+	{ "load-session", required_argument, 0, 'l'},
         { 0, 0, 0, 0 }
     };
 
@@ -2255,8 +2257,12 @@ int main(int argc, char *argv[])
                 DMESSAGE( "Going to connect to GUI at: %s", optarg );
                 gui_url = optarg;
                 break;
+	case 'l':
+	  DMESSAGE( "Using session file %s", optarg);
+	  load_session = optarg;
+	  break;
             case 'h':
-                printf( "Usage: %s [--osc-port portnum] [--session-root path]\n\n", argv[0] );
+                printf( "Usage: %s [--osc-port portnum] [--session-root path] [--load-session session-name]\n\n", argv[0] );
                 exit(0);
                 break;
         }
@@ -2330,6 +2336,15 @@ int main(int argc, char *argv[])
 
     osc_server->add_method( NULL, NULL, OSC_NAME( null ),NULL, "" );
 
+    if ( load_session )
+      {
+	char *spath;
+	asprintf( &spath, "%s/%s", session_root, load_session);
+	MESSAGE( "LOAD SESSION %s", spath);
+	load_session_file( spath );
+
+      }
+    
     if ( detach )
     {
         MESSAGE( "Detaching from console" );
